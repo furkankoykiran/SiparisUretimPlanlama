@@ -1,0 +1,7 @@
+.venv
+venv
+__pycache__
+*.pyc
+poetry.lock
+db/*
+!db/.gitkeep
