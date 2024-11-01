@@ -44,11 +44,12 @@ class Urun:
         urunler = db.urunleri_goster()
         if urunler:
             for urun in urunler:
+                urun_id, urun_adi, maliyet, stok = urun
                 print(f"""
-                ID: {urun[0]}
-                Ad: {urun[1]}
-                Maliyet: {urun[2]}
-                Stok: {urun[3]}
+                ID: {urun_id}
+                Ad: {urun_adi}
+                Maliyet: {maliyet}
+                Stok: {stok}
                 """)
         else:
             print("Görüntülenecek ürün yok.")
