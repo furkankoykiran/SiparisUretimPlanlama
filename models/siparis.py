@@ -35,7 +35,10 @@ class Siparis:
 
     @staticmethod
     def ekle(db):
-        Urun.goruntule(db)
+        urunler = Urun.goruntule(db)
+        if not urunler:
+            Helpers.hata_mesaji("Ürün bulunamadı. Önce ürün ekleyin.")
+            return
 
         urun_id = Helpers.dogrula_pozitif_tamsayi(f"Ürün ID'si: ")
         miktar = Helpers.dogrula_pozitif_tamsayi(f"Sipariş miktarı: ")
@@ -65,14 +68,16 @@ class Siparis:
         siparisler = db.siparisleri_goster()
         if siparisler:
             for siparis in siparisler:
+                siparis_id, urun_id, miktar, musteri_adi, oncelik, durum, siparis_tarihi, siparis_teslim_tarihi = siparis
                 print(f"""
-                Sipariş ID: {siparis[0]}
-                Durum: {siparis[1]}
-                Müşteri: {siparis[2]}
-                Ürün: {siparis[3]}
-                Miktar: {siparis[4]}
-                Teslim Tarihi: {siparis[5]}
-                Öncelik: {siparis[6]}
+                Sipariş ID: {siparis_id}
+                Durum: {durum}
+                Müşteri: {musteri_adi}
+                Ürün ID: {urun_id}
+                Miktar: {miktar}
+                Sipariş Tarihi: {siparis_tarihi}
+                Teslim Tarihi: {siparis_teslim_tarihi}
+                Öncelik: {oncelik}
                 """)
         else:
             print("Görüntülenecek sipariş yok.")
@@ -122,10 +127,9 @@ class Siparis:
     
     @staticmethod
     def satis_hesapla(db):
-        # Tamamlanmış siparişlerin toplam tutarını hesapla
         siparisler = db.tamamlanmis_siparisleri_getir()
         if not siparisler:
-            print("Hesaplanacak sipariş yok.")
+            Helpers.hata_mesaji("Tamamlanmış sipariş bulunamadı.")
             return
         
         toplam_tutar = 0
