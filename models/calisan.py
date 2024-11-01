@@ -32,7 +32,11 @@ class Calisan:
         soyisim = Helpers.dogrula_string(f"Çalışan soyadı: ")
         maas = Helpers.dogrula_pozitif_tamsayi(f"Maaş: ")
 
-        Urun.goruntule(db)
+        urunler = Urun.goruntule(db)
+        if not urunler:
+            Helpers.hata_mesaji("Ürün bulunamadı. Önce ürün ekleyin.")
+            return
+        
         urun_id = Helpers.dogrula_pozitif_tamsayi(f"Çalışanın üreteceği ürün ID'si: ")
 
         calisan_id = db.calisan_ekle(isim, soyisim, maas, urun_id)
@@ -43,12 +47,13 @@ class Calisan:
         calisanlar = db.calisanlari_goster()
         if calisanlar:
             for calisan in calisanlar:
+                calisan_id, isim, soyisim, maas, urun_adi = calisan
                 print(f"""
-                Çalışan ID: {calisan[0]}
-                İsim: {calisan[1]}
-                Soyisim: {calisan[2]}
-                Maaş: {calisan[3]}
-                Ürettiği Ürün: {calisan[4]}
+                Çalışan ID: {calisan_id}
+                İsim: {isim}
+                Soyisim: {soyisim}
+                Maaş: {maas}
+                Ürettiği Ürün: {urun_adi}
                 """)
         else:
             print("Görüntülenecek çalışan yok.")
