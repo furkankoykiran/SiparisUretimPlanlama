@@ -22,6 +22,7 @@ python main.py
 ├── main.py
 ├── models
 │   ├── calisan.py
+│   ├── raporlar.py
 │   ├── siparis.py
 │   └── urun.py
 ├── utils
