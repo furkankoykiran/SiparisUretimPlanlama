@@ -102,6 +102,9 @@ class SirketDB:
         """)
 
     def calisan_sil(self, calisan_id):
+        # Önce CalisanUrun tablosundaki ilgili kayıtları siliyoruz
+        self.db.execute("DELETE FROM CalisanUrun WHERE calisan_id = ?", (calisan_id,))
+        # Ardından Calisanlar tablosundan siliyoruz
         self.db.execute("DELETE FROM Calisanlar WHERE calisan_id = ?", (calisan_id,))
 
     def calisan_urun_ekle(self, calisan_id, urun_id):
@@ -118,10 +121,25 @@ class SirketDB:
         return self.db.select("SELECT siparis_id FROM Siparisler ORDER BY siparis_id DESC LIMIT 1")[0][0]
 
     def siparisleri_goster(self):
-        return self.db.select("SELECT siparis_id, urun_id, miktar, musteri_adi, oncelik, durum, siparis_tarihi, siparis_teslim_tarihi FROM Siparisler WHERE durum = 'Bekliyor'")
+        # Artık tüm siparişleri getiriyoruz (durum ayırt etmiyor)
+        return self.db.select("""
+            SELECT siparis_id, urun_id, miktar, musteri_adi, oncelik, durum, siparis_tarihi, siparis_teslim_tarihi 
+            FROM Siparisler
+        """)
     
     def siparis_durum_guncelle(self, siparis_id, durum):
-        self.db.execute("UPDATE Siparisler SET durum = ? WHERE siparis_id = ?", (durum, siparis_id))
+        if durum == "Tamamlandı":
+            self.db.execute("""
+                UPDATE Siparisler 
+                SET durum = ?, siparis_teslim_tarihi = datetime('now','localtime')
+                WHERE siparis_id = ?
+            """, (durum, siparis_id))
+        else:
+            self.db.execute("""
+                UPDATE Siparisler 
+                SET durum = ?, siparis_teslim_tarihi = NULL
+                WHERE siparis_id = ?
+            """, (durum, siparis_id))
 
     def siparis_miktarini_cek(self, siparis_id):
         return self.db.select("SELECT miktar FROM Siparisler WHERE siparis_id = ?", (siparis_id,))[0][0]
@@ -131,3 +149,24 @@ class SirketDB:
 
     def tamamlanmis_siparisleri_getir(self):
         return self.db.select("SELECT siparis_id, urun_id, miktar, siparis_tutari FROM Siparisler WHERE durum = 'Tamamlandı'")
+
+    def sirket_rapor_tamamlanmis_siparisler(self):
+        return self.db.select("""
+            SELECT urun_id, miktar, siparis_tutari 
+            FROM Siparisler 
+            WHERE durum = 'Tamamlandı'
+        """)
+
+    def sirket_rapor_siparis_sayilari(self):
+        return self.db.select("""
+            SELECT u.urun_adi, COUNT(s.siparis_id) as siparis_sayisi
+            FROM Siparisler s
+            JOIN Urunler u ON s.urun_id = u.urun_id
+            GROUP BY s.urun_id
+        """)
+
+    def sirket_rapor_stok_verisi(self):
+        return self.db.select("""
+            SELECT urun_adi, stok 
+            FROM Urunler
+        """)

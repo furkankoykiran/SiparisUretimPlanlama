@@ -65,7 +65,7 @@ class Siparis:
 
     @staticmethod
     def goruntule(db):
-        siparisler = db.siparisleri_goster()
+        siparisler = db.siparisleri_goster()  # Artık tüm siparişleri getiriyor
         if siparisler:
             for siparis in siparisler:
                 siparis_id, urun_id, miktar, musteri_adi, oncelik, durum, siparis_tarihi, siparis_teslim_tarihi = siparis
@@ -134,7 +134,7 @@ class Siparis:
         
         toplam_tutar = 0
         for siparis in siparisler:
-            siparis_id, urun_id, miktar, siparis_tutar = siparis
-            toplam_tutar += siparis_tutar
+            siparis_id, urun_id, miktar, siparis_tutari = siparis
+            toplam_tutar += siparis_tutari
 
         print(f"Toplam satış tutarı: {toplam_tutar} TL")
